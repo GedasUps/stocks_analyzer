@@ -1,0 +1,19 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "RentVest\\RentVest.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "RentVestGateway\\RentVestGateway.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "RentVest.Web\\RentVest.Web.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

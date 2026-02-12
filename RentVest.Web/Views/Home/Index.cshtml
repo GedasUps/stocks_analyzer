@@ -1,0 +1,160 @@
+﻿@model RentVest.Web.Models.SimulationViewModel
+@{
+    ViewData["Title"] = "RentVest Simulation";
+}
+
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-6"><i class="bi bi-graph-up-arrow text-primary"></i> Investment Recommendation</h1>
+            <p class="text-muted">See how your rent money would perform in a diversified portfolio.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- LEFT COLUMN: INPUTS -->
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Parameters</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Index" method="post">
+                        <div class="mb-3">
+                            <label class="form-label">Investment Date</label>
+                            <input asp-for="StartDate" type="date" class="form-control" value="@Model.StartDate.ToString("yyyy-MM-dd")  />
+                            <small class="text-muted">Select a past date to test historical performance.</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Amount</label>
+                            <div class="input-group">
+                               <!--</> <span class="input-group-text">$</span>-->
+                                <input asp-for="RentAmount" type="number" class="form-control"  />
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Currency</label>
+                            <select asp-for="Currency" class="form-select">
+                                <option value="EUR">EUR (€)</option>
+                                <option value="USD">USD ($)</option>
+                                <option value="GBP">GBP (£)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Risk Tolerance</label>
+                            <select asp-for="RiskLevel" class="form-select">
+                                <option value="Conservative">Conservative (Bonds/Safe)</option>
+                                <option value="Moderate">Moderate (Balanced)</option>
+                                <option value="Aggressive">Aggressive (Tech/Stocks)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Generate Recommendation</button>
+                    </form>
+
+                    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                    {
+                        <div class="alert alert-danger mt-3">@Model.ErrorMessage</div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: RESULTS -->
+        <div class="col-md-8">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Results (In USD)</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.Results == null)
+                    {
+                        <div class="text-center text-muted py-5">
+                            <i class="bi bi-bar-chart-steps" style="font-size: 2rem;"></i>
+                            <p class="mt-2">Run the simulation to see your personalized portfolio.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- Summary Cards -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <div class="p-3 border rounded bg-light text-center">
+                                    <small class="text-muted">Total Invested (USD)</small>
+                                    <h4>$@Model.Results.TotalInvestedUSD.ToString("N2")</h4>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3 border rounded bg-light text-center">
+                                    <small class="text-muted">End Value (1 Month)</small>
+                                    <h4 class="text-primary">$@Model.Results.TotalValueAfterMonthUSD.ToString("N2")</h4>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="p-3 border rounded text-center @(Model.Results.ProfitOrLossUSD >= 0 ? "bg-success-subtle" : "bg-danger-subtle")">
+                                    <small class="text-muted">Profit/Loss</small>
+                                    <h4 class="@(Model.Results.ProfitOrLossUSD >= 0 ? "text-success" : "text-danger")">
+                                        @Model.Results.ProfitOrLossUSD.ToString("N2") (@Model.Results.ProfitOrLossPercentage.ToString("N2")%)
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Portfolio Table -->
+                        <h6 class="text-secondary"><i class="bi bi-pie-chart-fill"></i> Recommended Portfolio</h6>
+                        <div class="table-responsive mb-4">
+                            <table class="table table-hover table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Type</th>
+                                        <th>Allocation</th>
+                                        <th>Invested</th>
+                                        <th>Profit</th>
+                                        <th>AVG</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Results.Portfolio)
+                                    {
+                                        <tr>
+                                            <td class="fw-bold">@item.Symbol</td>
+                                            <td><span class="badge bg-secondary">@item.Type</span></td>
+                                            <td>@((item.AllocationPercentage * 100).ToString("0"))%</td>
+                                            <td>$@item.AmountInvestedUSD.ToString("N2")</td>
+                                            <td class="@(item.Profit >= 0 ? "text-success" : "text-danger")">
+                                                $@item.Profit.ToString("N2")
+                                            </td>
+                                            <td>@item.AveragePrice.ToString("N2")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- News Section -->
+                        <h6 class="text-secondary"><i class="bi bi-newspaper"></i> Why did the market move?</h6>
+                        <div class="list-group">
+                            @if (Model.Results.RelatedNews.Any())
+                            {
+                                @foreach (var news in Model.Results.RelatedNews)
+                                {
+                                    <a href="@news.Url" target="_blank" class="list-group-item list-group-item-action">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1 text-primary">@news.Title</h6>
+                                            <small class="text-muted">@news.Source</small>
+                                        </div>
+                                        <small class="text-muted">Click to read full article <i class="bi bi-box-arrow-up-right"></i></small>
+                                    </a>
+                                }
+                            }
+                            else
+                            {
+                                <div class="alert alert-warning">No specific news found for this period.</div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

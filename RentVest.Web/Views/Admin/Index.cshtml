@@ -1,0 +1,36 @@
+﻿@model List<RentVest.Web.Controllers.UserDto>
+
+<div class="container mt-5">
+    <h2 class="text-danger mb-4"><i class="bi bi-shield-lock-fill"></i> Admin Panel</h2>
+
+    <div class="card shadow">
+        <div class="card-header">Registered Users</div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Risk Profile</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr>
+                            <td>@user.Id</td>
+                            <td>@user.Username</td>
+                            <td>
+                                <span class="badge @(user.Role == "Admin" ? "bg-danger" : "bg-primary")">
+                                    @user.Role
+                                </span>
+                            </td>
+                            <td>@user.RiskTolerance</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
