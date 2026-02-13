@@ -21,87 +21,106 @@ graph LR
     API -- JSON --> Ext[External APIs]
 ```
 **Components**
-RentVest.Web (Frontend):
-ASP.NET Core MVC application serving the UI.
-Acts as a REST Client using HttpClient.
-Handles Session storage for JWT tokens.
-RentVestGateway (Middleware):
-Ocelot API Gateway acting as a Reverse Proxy.
-Handles Routing, Rate Limiting (DDoS protection), and SSL Termination.
-RentVest.Api (Backend):
-Core business logic and calculations.
-Manages database connections via Entity Framework Core.
-Orchestrates external API calls with caching strategies.
+***RentVest.Web (Frontend)***:
+
+    ASP.NET Core MVC application serving the UI.
+    Acts as a REST Client using HttpClient.
+    Handles Session storage for JWT tokens.
+    RentVestGateway (Middleware):
+    Ocelot API Gateway acting as a Reverse Proxy.
+    Handles Routing, Rate Limiting (DDoS protection), and SSL Termination.`
+
+    
+***RentVest.Api (Backend)***:
+
+    Core business logic and calculations.
+    Manages database connections via Entity Framework Core.
+    Orchestrates external API calls with caching strategies.
+
+    
 **🚀 Key Features**
+
+
 🔐 Secure Authentication & RBAC:
-JWT (JSON Web Token) based authentication.
-Role-Based Access Control: Separate logic for User (Simulation) and Admin (System View).
-Secure password hashing using BCrypt.
+
+    JWT (JSON Web Token) based authentication.
+    Role-Based Access Control: Separate logic for User (Simulation) and Admin (System View).
+    Secure password hashing using BCrypt.
 💹 Intelligent Simulation Engine:
-Simulates portfolios based on Risk Tolerance (Conservative, Moderate, Aggressive).
-Calculates historical performance using real market data.
-Handles currency conversion (EUR/USD/GBP) based on historical exchange rates.
+
+    Simulates portfolios based on Risk Tolerance (Conservative, Moderate, Aggressive).
+    Calculates historical performance using real market data.
+    Handles currency conversion (EUR/USD/GBP) based on historical exchange rates.
 🌍 External Data Integration:
-Alpha Vantage: Fetches historical Stock/ETF prices (Cached in DB).
-Frankfurter: Fetches historical Currency Exchange rates.
-NewsAPI.ai: Fetches contextual financial news for the simulation period.
+
+    Alpha Vantage: Fetches historical Stock/ETF prices (Cached in DB).
+    Frankfurter: Fetches historical Currency Exchange rates.
+    NewsAPI.ai: Fetches contextual financial news for the simulation period.
 ⚡ Performance & Resilience:
-Smart Caching: Local database caching minimizes external API calls and latency.
-Rate Limiting: Ocelot Gateway restricts request frequency to prevent abuse.
-Graceful Fallbacks: Handles external API failures or rate limits without crashing the user experience.
+
+    Smart Caching: Local database caching minimizes external API calls and latency.
+    Rate Limiting: Ocelot Gateway restricts request frequency to prevent abuse.
+    Graceful Fallbacks: Handles external API failures or rate limits without crashing the user experience.
+
+
 **🛠️ Tech Stack**
-Component	Technology
-Framework	.NET 8 (C#)
-Frontend	ASP.NET Core MVC, Bootstrap 5, JavaScript
-Gateway	Ocelot
-Database	SQLite (Dev) / SQL Server (Prod)
-ORM	Entity Framework Core
-Documentation	Swagger / OpenAPI
+
+
+    Component	Technology
+    Framework	.NET 8 (C#)
+    Frontend	ASP.NET Core MVC, Bootstrap 5, JavaScript
+    Gateway	Ocelot
+    Database	SQLite (Dev) / SQL Server (Prod)
+    ORM	Entity Framework Core
+    Documentation	Swagger / OpenAPI
+
+
 **⚙️ Setup & Configuration**
-Prerequisites
-.NET 8 SDK
-Visual Studio 2022 or VS Code
-API Keys (Required):
-Alpha Vantage (Stock Data)
-NewsAPI.ai (News Data)
-1. Clone the Repository
-code
-Bash
-git clone https://github.com/your-username/RentVest.git
-cd RentVest
-2. Configure Secrets (appsettings.json)
-You must configure the secrets in two locations. Ensure the JWT Secret Token matches in both files.
-Location 1: RentVest.Api/appsettings.json
-code
-JSON
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "Data Source=rentvest.db"
-  },
-  "AppSettings": {
-    "Token": "YOUR_SUPER_SECURE_LONG_SECRET_KEY_MUST_MATCH_GATEWAY"
-  },
-  "AlphaVantage": {
-    "ApiKey": "YOUR_ALPHA_VANTAGE_KEY"
-  },
-  "News": {
-    "ApiKey": "YOUR_NEWSAPI_KEY",
-    "Url": "https://eventregistry.org/api/v1/article/getArticles"
-  }
-}
-Location 2: RentVestGateway/appsettings.json
-code
-JSON
-{
-  "AppSettings": {
-    "Token": "YOUR_SUPER_SECURE_LONG_SECRET_KEY_MUST_MATCH_GATEWAY"
-  }
-}
-3. Database Migration
-Initialize the database using Entity Framework Core.
-code
-Powershell
-# Run in Package Manager Console or Terminal
+
+    Prerequisites
+    .NET 8 SDK
+    Visual Studio 2022 or VS Code
+    API Keys (Required):
+    Alpha Vantage (Stock Data)
+    NewsAPI.ai (News Data)
+    1. Clone the Repository
+    code
+    Bash
+    git clone https://github.com/your-username/RentVest.git
+    cd RentVest
+    2. Configure Secrets (appsettings.json)
+    You must configure the secrets in two locations. Ensure the JWT Secret Token matches in both files.
+    Location 1: RentVest.Api/appsettings.json
+    code
+    JSON
+    {
+      "ConnectionStrings": {
+        "DefaultConnection": "Data Source=rentvest.db"
+      },
+      "AppSettings": {
+        "Token": "YOUR_SUPER_SECURE_LONG_SECRET_KEY_MUST_MATCH_GATEWAY"
+      },
+      "AlphaVantage": {
+        "ApiKey": "YOUR_ALPHA_VANTAGE_KEY"
+      },
+      "News": {
+        "ApiKey": "YOUR_NEWSAPI_KEY",
+        "Url": "https://eventregistry.org/api/v1/article/getArticles"
+      }
+    }
+    Location 2: RentVestGateway/appsettings.json
+    code
+    JSON
+    {
+      "AppSettings": {
+        "Token": "YOUR_SUPER_SECURE_LONG_SECRET_KEY_MUST_MATCH_GATEWAY"
+      }
+    }
+    3. Database Migration
+    Initialize the database using Entity Framework Core.
+    code
+    Powershell
+# Run in Package Manager Console or Terminal*
 dotnet ef database update --project RentVest.Data --startup-project RentVest.Api
 **▶️ How to Run**
 To run the full system, all three projects must be running simultaneously.
